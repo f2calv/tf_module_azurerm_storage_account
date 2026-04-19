@@ -1,15 +1,26 @@
 output "id" {
-  value = azurerm_storage_account.this.id
+  description = "The ID of the storage account."
+  value       = azurerm_storage_account.this.id
 }
+
 output "name" {
-  value = azurerm_storage_account.this.name
+  description = "The name of the storage account."
+  value       = azurerm_storage_account.this.name
 }
+
 output "location" {
-  value = azurerm_storage_account.this.location
+  description = "The location of the storage account."
+  value       = azurerm_storage_account.this.location
 }
+
 output "primary_access_key" {
-  value = azurerm_storage_account.this.primary_access_key
+  description = "The primary access key for the storage account."
+  value       = azurerm_storage_account.this.primary_access_key
+  sensitive   = true
 }
+
 output "primary_connection_string" {
-  value = azurerm_storage_account.this.primary_connection_string
+  description = "The primary connection string for the storage account."
+  value       = azurerm_storage_account.this.primary_connection_string
+  sensitive   = true
 }
