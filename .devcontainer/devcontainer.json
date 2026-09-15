@@ -1,0 +1,40 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/ubuntu
+{
+    "name": "tf_module_azurerm_storage_account",
+    "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+    // Features to add to the dev container. More info: https://containers.dev/features.
+    "features": {
+        "ghcr.io/devcontainers/features/terraform:1": {
+            "version": "1.16.2",
+            "tflint": "0.59.1"
+        },
+        "ghcr.io/dhoeric/features/terraform-docs:1": {
+            "version": "latest"
+        },
+        // Provides npx, used to run markdownlint against the README without a global install.
+        "ghcr.io/devcontainers/features/node:2": {
+            "version": "lts"
+        }
+    },
+    "postCreateCommand": "bash .devcontainer/postCreateCommand.sh",
+    // Configure tool-specific properties.
+    "customizations": {
+        // Configure properties specific to VS Code.
+        "vscode": {
+            // Set *default* container specific settings.json values on container create.
+            "settings": {
+                "editor.formatOnSave": true,
+                "[terraform]": {
+                    "editor.defaultFormatter": "hashicorp.terraform"
+                }
+            },
+            // Add the IDs of extensions you want installed when the container is created.
+            "extensions": [
+                "hashicorp.terraform",
+                "davidanson.vscode-markdownlint",
+                "editorconfig.editorconfig"
+            ]
+        }
+    }
+}
