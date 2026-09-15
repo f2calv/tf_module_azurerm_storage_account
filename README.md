@@ -1,12 +1,15 @@
-# Terraform Module: Azure Storage Account
+---
+title: Terraform Module for Azure Storage Account
+description: Provision a secure Azure Storage Account with managed identity
+---
 
-Provisions an [Azure Storage Account](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account) with sensible defaults — TLS 1.2 enforced, public blob access disabled, SystemAssigned managed identity enabled.
+Provisions an [Azure Storage Account](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account) with TLS 1.2 enforced, public blob access disabled, and a system-assigned managed identity enabled.
 
 ## Usage
 
 ```hcl
 module "storage" {
-  source               = "git::https://github.com/f2calv/tf_module_azurerm_storage_account.git//src?ref=main"
+  source               = "git::https://github.com/f2calv/tf_module_azurerm_storage_account.git//src?ref=v0.2.0"
   resource_group_name  = azurerm_resource_group.rg.name
   location             = azurerm_resource_group.rg.location
   storage_account_name = "mystorageaccount"
@@ -18,9 +21,9 @@ module "storage" {
 
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
-| `resource_group_name` | `string` | — | Name of the parent resource group |
+| `resource_group_name` | `string` | Required | Name of the parent resource group |
 | `location` | `string` | `West Europe` | Location of the parent resource group |
-| `storage_account_name` | `string` | — | Name of the storage account |
+| `storage_account_name` | `string` | Required | Name of the storage account |
 | `access_tier` | `string` | `Hot` | Storage account access tier (Hot or Cool) |
 | `account_kind` | `string` | `StorageV2` | Storage account kind (StorageV2, BlobStorage, etc.) |
 | `account_tier` | `string` | `Standard` | Storage account tier (Standard or Premium) |
