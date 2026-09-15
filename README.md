@@ -1,7 +1,4 @@
----
-title: Terraform Module for Azure Storage Account
-description: Provision a secure Azure Storage Account with managed identity
----
+# Terraform Module for Azure Storage Account
 
 Provisions an [Azure Storage Account](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account) with TLS 1.2 enforced, public blob access disabled, and a system-assigned managed identity enabled.
 
