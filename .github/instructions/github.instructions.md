@@ -11,25 +11,21 @@ applyTo: '**'
 - Prefer a clean versioned release over compatibility code. Consumers remain on an older immutable tag until they are ready to migrate.
 - Remove commented-out implementations and speculative placeholders. Git retains history.
 
-## Semantic Versioning
+## Branch Naming
 
-- Before adding a `+semver:` directive, inspect every commit between the merge base with `origin/main` and `HEAD`.
-- A branch must contain exactly one `+semver:` directive. If one already exists, do not add another to a later commit.
-- Use `+semver:feature` for a breaking module change, including removed or renamed inputs, outputs and resource addresses.
-- Place the directive in the commit that introduces the versioned behavior. Do not repeat it in documentation, formatting or release-tag synchronization commits.
-- After the branch is complete, run GitVersion using the repository's `GitVersion.yml` and verify the numeric major, minor and patch result before creating a pull request.
+- Name feature branches `<github_username>/yyyy-MM-concise-name`, for example `<github_username>/2026-09-tf-docs`.
+- Use the branch creation year and month followed by concise, lowercase kebab-case wording.
 
-## Release References
+## Pull Requests
 
-- Keep the module source example in `README.md` pinned to the immutable tag that GitVersion predicts for the final branch.
-- Exclude feature-branch prerelease labels from the README tag.
-- Recalculate the expected tag after the final commit. Do not assume that an earlier calculation remains valid.
+- Inspect the repository's available labels when creating a pull request and apply every label that accurately describes the change.
+- Assign a new pull request to the currently authenticated GitHub user. Resolve the login dynamically from the GitHub client or API; never hardcode a username in instructions or automation.
+- Verify the pull request's base branch, head branch, labels and assignee after creation.
 
 ## Continuous Integration
 
 - Pull requests must run Terraform formatting, backend-free initialization and validation without Azure credentials.
-- Treat a mismatch between the GitVersion result and the README module source tag as a failed check.
-- Require the validation job in the `main` branch ruleset before allowing a pull request to merge.
+- Require `lint / lint`, `versioning / gha-release-versioning` and `validate / terraform validate` as status checks in the `main` branch ruleset.
 
 ## Dependency Automation
 

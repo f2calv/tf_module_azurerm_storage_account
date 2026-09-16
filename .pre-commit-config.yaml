@@ -55,3 +55,9 @@ repos:
   hooks:
   - id: markdownlint
     args: ["--disable", "MD013", "--disable", "MD034", "--"]
+- repo: https://github.com/terraform-docs/terraform-docs
+  rev: v0.24.0
+  hooks:
+  - id: terraform-docs-go
+    args: ["--config", ".terraform-docs.yml", "src"]
+    pass_filenames: false

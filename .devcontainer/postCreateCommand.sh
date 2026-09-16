@@ -13,6 +13,7 @@ echo
 echo "*****************************************************"
 echo "Lint this module with:"
 echo "*****************************************************"
+echo "  terraform-docs --config .terraform-docs.yml src"
 echo "  terraform -chdir=src fmt -check -recursive -diff"
 echo "  terraform -chdir=src init -backend=false && terraform -chdir=src validate"
 echo "  tflint --chdir=src --recursive"
