@@ -10,7 +10,7 @@
             "tflint": "0.59.1"
         },
         "ghcr.io/dhoeric/features/terraform-docs:1": {
-            "version": "latest"
+            "version": "0.24.0"
         },
         // Provides npx, used to run markdownlint against the README without a global install.
         "ghcr.io/devcontainers/features/node:2": {
