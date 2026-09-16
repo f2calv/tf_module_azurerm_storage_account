@@ -21,14 +21,13 @@ This repository publishes a single reusable module under `src/`, consumed over a
 
 ## Module Versioning
 
-- Each branch must contain exactly one `+semver:` directive. Inspect every commit from the merge base with `origin/main` through `HEAD` before adding it, and place it in the commit that introduces the versioned behavior.
-- Use `+semver:feature` for breaking changes, including removed or renamed inputs, outputs and resource addresses.
-- Use `+semver:patch` for backward-compatible changes.
+- Before adding a `+semver:` directive, inspect every commit between the merge base with `origin/main` and `HEAD`. A branch must contain exactly one directive, placed in the commit that introduces the versioned behavior.
+- Use `+semver:feature` for breaking changes, including removed or renamed inputs, outputs and resource addresses. Use `+semver:patch` for compatible changes.
 - After the branch is complete, run GitVersion with the repository's `GitVersion.yml` and verify the final numeric major, minor and patch result.
-- Publish reusable module releases only as immutable plain `X.Y.Z` tags. Do not use a `v` prefix, moving aliases such as major-only tags, or CI and pre-release suffixes on releases from `main`.
-- Reusable release-versioning workflow calls must set `tag-prefix: ''` and `move-major-tag: false`.
-- Pin the module source example in `README.md` to the expected final `X.Y.Z` tag from GitVersion, excluding feature-branch pre-release labels, and recalculate it after the final commit.
-- Treat any mismatch between the README source ref and the expected final release tag as a CI failure.
+- Publish reusable module releases only as immutable plain `X.Y.Z` tags. Do not use a `v` prefix, moving aliases or CI and pre-release suffixes for main-branch releases.
+- Reusable release-versioning workflow calls must explicitly set `tag-prefix: ''` and `move-major-tag: false`.
+- Pin the module source example in `README.md` to the expected final immutable tag from the release workflow's numeric major, minor and patch outputs. Exclude feature-branch pre-release labels, and update the README in the same change.
+- Treat a mismatch between the README source ref and the expected final release tag as a CI failure.
 
 ## File Conventions
 
@@ -55,8 +54,8 @@ This repository publishes a single reusable module under `src/`, consumed over a
 - **Registry comment-link above each resource block**, pointing at the provider documentation for that resource type:
 
   ```hcl
-  # https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/application_insights
-  resource "azurerm_application_insights" "this" {
+  # https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/<resource_type>
+  resource "azurerm_<resource_type>" "this" {
   ```
 
 - **Accept ids rather than creating shared dependencies.** A resource that could reasonably be shared by several callers — a workspace, a resource group, a vnet — is passed in by id, not created here. Creating it inside the module hands its lifecycle to whichever caller happened to instantiate the module first.
@@ -75,6 +74,17 @@ This repository publishes a single reusable module under `src/`, consumed over a
 - **No secrets in the module.** Never hardcode a key, connection string or credential, and never give a variable a secret default.
 - **Sensitive outputs** are marked `sensitive = true` so they are redacted from plan output and CI logs.
 - Terraform writes output values into the caller's state, so a sensitive output is only as protected as their state backend. Keep the surface minimal — expose an id or an endpoint rather than a raw key wherever the caller can look the secret up itself.
+
+## Continuous Integration
+
+- Pull requests must run `terraform fmt`, a backend-free `terraform init` and `terraform validate`, and all three must pass without Azure credentials. The module declares no backend, so `-backend=false` is sufficient.
+- Require `validate / terraform validate` as a status check on `main`, alongside the repository-wide lint and versioning checks.
+
+## Dependency Automation
+
+- Configure Dependabot's `terraform` ecosystem for `src/` so provider and module version constraints are monitored.
+- Keep provider ranges broad within the current supported major, and do not commit `.terraform.lock.hcl`. A reusable child module must not pin the caller's provider build; the lock file belongs to the root module.
+- Validate automated provider-major updates through the same pull request checks as manually authored changes.
 
 ## Forward-Only Maintenance
 

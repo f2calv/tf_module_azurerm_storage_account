@@ -1,5 +1,5 @@
 ---
-description: 'Repository-wide forward-only maintenance, versioning and continuous integration conventions.'
+description: 'Repository-wide forward-only maintenance, branch, pull request and continuous integration conventions.'
 applyTo: '**'
 ---
 
@@ -13,8 +13,8 @@ applyTo: '**'
 
 ## Branch Naming
 
-- Name feature branches `<github_username>/yyyy-MM-concise-name`, for example `<github_username>/2026-09-tf-docs`.
-- Use the branch creation year and month followed by concise, lowercase kebab-case wording.
+- Name feature branches `<github_username>/yyyy-MM-concise-name`, for example `<github_username>/2026-09-update-docs`.
+- Use the branch creation year and month, followed by concise lowercase kebab-case wording.
 
 ## Pull Requests
 
@@ -24,12 +24,10 @@ applyTo: '**'
 
 ## Continuous Integration
 
-- Pull requests must run Terraform formatting, backend-free initialization and validation without Azure credentials.
-- Require `lint / lint`, `versioning / gha-release-versioning` and `validate / terraform validate` as status checks in the `main` branch ruleset.
+- Pull requests must run the repository's formatting, initialization and validation checks, and every one of them must pass without cloud credentials.
+- Require `lint / lint` and `versioning / gha-release-versioning`, together with the repository's own validation check, as status checks in the `main` branch ruleset.
 
 ## Dependency Automation
 
-- Configure Dependabot's `terraform` ecosystem for `src/` so provider and module version constraints are monitored.
-- Keep dependency ranges in child modules broad within the current supported provider major. Do not commit a dependency lock file for a reusable child module.
-- Configure Dependabot's `helm` ecosystem in repositories containing Helm charts, with one entry per chart directory or a `directories` pattern covering every `Chart.yaml`.
-- Validate automated provider-major and chart updates through the same pull request checks as manually authored changes.
+- Configure Dependabot for every package ecosystem the repository uses, with one entry per manifest directory or a `directories` pattern covering them all.
+- Validate automated dependency updates through the same pull request checks as manually authored changes.
