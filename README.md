@@ -1,9 +1,10 @@
 # Terraform Module for Azure Storage Account
 
 Provisions an [Azure Storage Account](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account)
-with TLS 1.2 enforced, public blob access disabled, and a system-assigned
-managed identity. The caller owns the resource group, provider configuration,
-backend, and Terraform state.
+with explicit transport, authentication, replication, identity, and public
+endpoint firewall controls. Secure defaults enforce TLS 1.2, disable anonymous
+blob access, and add a system-assigned managed identity. The caller owns the
+resource group, provider configuration, backend, and Terraform state.
 
 ## Dependency Graph
 
@@ -29,7 +30,7 @@ module "storage" {
 The resource group in this example is created by the calling root module and is
 not managed by this module.
 
-<!-- markdownlint-disable MD060 -->
+<!-- markdownlint-disable MD033 MD060 -->
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
 
@@ -60,7 +61,18 @@ not managed by this module.
 | account\_kind | Storage account kind (StorageV2, BlobStorage, etc.). | `string` | `"StorageV2"` | no |
 | account\_replication\_type | Storage account replication type (LRS, GRS, RAGRS, ZRS). | `string` | `"LRS"` | no |
 | account\_tier | Storage account tier (Standard or Premium). | `string` | `"Standard"` | no |
+| allow\_nested\_items\_to\_be\_public | Whether nested items may be configured for anonymous public access. | `bool` | `false` | no |
+| cross\_tenant\_replication\_enabled | Whether object replication may cross Microsoft Entra tenants. | `bool` | `false` | no |
+| default\_to\_oauth\_authentication | Whether Azure portal data operations default to OAuth authentication. | `bool` | `false` | no |
+| https\_traffic\_only\_enabled | Whether the storage account accepts HTTPS traffic only. | `bool` | `true` | no |
+| identity\_type | Managed identity type, or null to omit a managed identity. | `string` | `"SystemAssigned"` | no |
+| infrastructure\_encryption\_enabled | Whether a second layer of platform-managed encryption is enabled. | `bool` | `false` | no |
+| local\_user\_enabled | Whether local users may access the storage account through SFTP or files. | `bool` | `false` | no |
 | location | Location of the parent resource group. | `string` | `"West Europe"` | no |
+| min\_tls\_version | Minimum TLS version permitted for storage account requests. | `string` | `"TLS1_2"` | no |
+| network\_rules | Public endpoint firewall rules, or null to retain Azure defaults. | ```object({ default_action = string bypass = set(string) ip_rules = set(string) virtual_network_subnet_ids = set(string) })``` | `null` | no |
+| public\_network\_access | Public network endpoint state (Enabled or Disabled), or null to use the provider default. | `string` | `null` | no |
+| shared\_access\_key\_enabled | Whether requests may be authorized with shared access keys. | `bool` | `true` | no |
 | tags | Any tags that should be present on the resources. | `map(string)` | `{}` | no |
 
 ## Outputs
@@ -73,7 +85,7 @@ not managed by this module.
 | primary\_access\_key | The primary access key for the storage account. |
 | primary\_connection\_string | The primary connection string for the storage account. |
 <!-- END_TF_DOCS -->
-<!-- markdownlint-enable MD060 -->
+<!-- markdownlint-enable MD033 MD060 -->
 
 ## Development
 
