@@ -21,8 +21,9 @@ This repository publishes a single reusable module under `src/`, consumed over a
 
 ## Module Versioning
 
-- Before adding a `+semver:` directive, inspect every commit between the merge base with `origin/main` and `HEAD`. A branch must contain exactly one directive, placed in the commit that introduces the versioned behavior.
-- Use `+semver:feature` for breaking changes, including removed or renamed inputs, outputs and resource addresses. Use `+semver:patch` for compatible changes.
+- Continuous integration bumps the patch version on every pull request, so a `+semver:` directive is only needed to request a larger increment than a patch.
+- Before adding a `+semver:` directive, inspect every commit between the merge base with `origin/main` and `HEAD`. A branch must contain at most one directive, placed in the commit that introduces the versioned behavior.
+- Use `+semver:feature` for breaking changes, including removed or renamed inputs, outputs and resource addresses. A compatible change needs no directive.
 - After the branch is complete, run GitVersion with the repository's `GitVersion.yml` and verify the final numeric major, minor and patch result.
 - Publish reusable module releases only as immutable plain `X.Y.Z` tags. Do not use a `v` prefix, moving aliases or CI and pre-release suffixes for main-branch releases.
 - Reusable release-versioning workflow calls must explicitly set `tag-prefix: ''` and `move-major-tag: false`.
