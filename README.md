@@ -19,7 +19,7 @@ graph LR
 
 ```hcl
 module "storage" {
-  source               = "git::https://github.com/f2calv/tf_module_azurerm_storage_account.git//src?ref=0.2.3"
+  source               = "git::https://github.com/f2calv/tf_module_azurerm_storage_account.git//src?ref=0.3.0"
   resource_group_name  = azurerm_resource_group.rg.name
   location             = azurerm_resource_group.rg.location
   storage_account_name = "mystorageaccount"
