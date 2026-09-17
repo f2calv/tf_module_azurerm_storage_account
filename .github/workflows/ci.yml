@@ -3,12 +3,13 @@ name: ci
 on:
   workflow_dispatch:
   push:
-    paths-ignore:
-      - .github/dependabot.yml
-      - LICENSE
+    branches: [main]
   pull_request:
     branches: [main]
-    types: [opened, synchronize, reopened]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 permissions: {}
 
