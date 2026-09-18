@@ -33,7 +33,9 @@
             "extensions": [
                 "hashicorp.terraform",
                 "davidanson.vscode-markdownlint",
-                "editorconfig.editorconfig"
+                "editorconfig.editorconfig",
+                "redhat.vscode-yaml",
+                "github.vscode-github-actions"
             ]
         }
     }
