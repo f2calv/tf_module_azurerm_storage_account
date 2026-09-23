@@ -1,10 +1,10 @@
 {
-    "recommendations": [
-        "hashicorp.terraform",
-        "ms-azuretools.vscode-azure-mcp-server",
-        "davidanson.vscode-markdownlint",
-        "editorconfig.editorconfig",
-        "redhat.vscode-yaml",
-        "github.vscode-github-actions"
-    ]
+  "recommendations": [
+    "hashicorp.terraform",
+    "ms-azuretools.vscode-azure-mcp-server",
+    "davidanson.vscode-markdownlint",
+    "editorconfig.editorconfig",
+    "redhat.vscode-yaml",
+    "github.vscode-github-actions"
+  ]
 }
