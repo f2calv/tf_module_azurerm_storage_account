@@ -24,3 +24,28 @@ output "primary_connection_string" {
   value       = azurerm_storage_account.this.primary_connection_string
   sensitive   = true
 }
+
+output "container_ids" {
+  description = "ARM resource IDs of private Blob containers keyed by name."
+  value       = { for name, container in azurerm_storage_container.this : name => container.id }
+}
+
+output "container_urls" {
+  description = "Credential-free Blob container URLs keyed by name."
+  value       = { for name, container in azurerm_storage_container.this : name => container.url }
+}
+
+output "queue_ids" {
+  description = "ARM resource IDs of Storage Queues keyed by name."
+  value       = { for name, queue in azurerm_storage_queue.this : name => queue.id }
+}
+
+output "queue_urls" {
+  description = "Credential-free Storage Queue URLs keyed by name."
+  value       = { for name, queue in azurerm_storage_queue.this : name => queue.url }
+}
+
+output "table_ids" {
+  description = "ARM resource IDs of Storage Tables keyed by name."
+  value       = { for name, table in azurerm_storage_table.this : name => table.id }
+}
