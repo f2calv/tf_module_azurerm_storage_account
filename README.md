@@ -23,7 +23,7 @@ graph LR
 
 ```hcl
 module "storage" {
-  source               = "git::https://github.com/f2calv/tf_module_azurerm_storage_account.git//src?ref=0.3.2"
+  source               = "git::https://github.com/f2calv/tf_module_azurerm_storage_account.git//src?ref=0.4.0"
   resource_group_name  = azurerm_resource_group.rg.name
   location             = azurerm_resource_group.rg.location
   storage_account_name = "mystorageaccount"
@@ -36,9 +36,9 @@ not managed by this module.
 
 ### Collection Configuration
 
-Collection support in this checkout is not yet published in release `0.3.2`.
+Collection support requires release `0.4.0` or later.
 The following development example runs from the root of this checkout; production
-callers must pin the immutable release containing these inputs once published.
+callers must pin a published immutable release containing these inputs.
 
 ```hcl
 provider "azurerm" {
