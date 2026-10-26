@@ -18,6 +18,18 @@ resource "azurerm_storage_account" "this" {
   local_user_enabled                = var.local_user_enabled
   tags                              = var.tags
 
+  lifecycle {
+    precondition {
+      condition     = length(var.containers) == 0 || contains(["Storage", "StorageV2", "BlobStorage", "BlockBlobStorage"], var.account_kind)
+      error_message = "Containers require a Blob-capable storage account kind."
+    }
+
+    precondition {
+      condition     = (length(var.queues) == 0 && length(var.tables) == 0) || (contains(["Storage", "StorageV2"], var.account_kind) && var.account_tier == "Standard")
+      error_message = "Queues and tables require a Standard Storage or StorageV2 account."
+    }
+  }
+
   dynamic "network_rules" {
     for_each = var.network_rules == null ? [] : [var.network_rules]
 
@@ -36,4 +48,29 @@ resource "azurerm_storage_account" "this" {
       type = identity.value
     }
   }
+}
+
+# https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_container
+resource "azurerm_storage_container" "this" {
+  for_each = var.containers
+
+  name                  = each.key
+  storage_account_id    = azurerm_storage_account.this.id
+  container_access_type = "private"
+}
+
+# https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_queue
+resource "azurerm_storage_queue" "this" {
+  for_each = var.queues
+
+  name               = each.key
+  storage_account_id = azurerm_storage_account.this.id
+}
+
+# https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_table
+resource "azurerm_storage_table" "this" {
+  for_each = var.tables
+
+  name               = each.key
+  storage_account_id = azurerm_storage_account.this.id
 }

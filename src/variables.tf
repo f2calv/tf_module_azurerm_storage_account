@@ -116,3 +116,53 @@ variable "tags" {
   description = "Any tags that should be present on the resources."
   default     = {}
 }
+
+variable "containers" {
+  type        = set(string)
+  description = "Names of private Blob containers to manage."
+  default     = []
+  nullable    = false
+
+  validation {
+    condition = alltrue([
+      for name in var.containers :
+      length(name) >= 3 && length(name) <= 63 && can(regex("^[a-z0-9]+(-[a-z0-9]+)*$", name))
+    ])
+    error_message = "Container names must contain 3-63 lowercase letters, digits or single hyphens, beginning and ending with a letter or digit."
+  }
+}
+
+variable "queues" {
+  type        = set(string)
+  description = "Names of Storage Queues to manage; message TTL is configured by producers."
+  default     = []
+  nullable    = false
+
+  validation {
+    condition = alltrue([
+      for name in var.queues :
+      length(name) >= 3 && length(name) <= 63 && can(regex("^[a-z0-9]+(-[a-z0-9]+)*$", name))
+    ])
+    error_message = "Queue names must contain 3-63 lowercase letters, digits or single hyphens, beginning and ending with a letter or digit."
+  }
+}
+
+variable "tables" {
+  type        = set(string)
+  description = "Names of Storage Tables to manage."
+  default     = []
+  nullable    = false
+
+  validation {
+    condition = alltrue([
+      for name in var.tables :
+      can(regex("^[A-Za-z][A-Za-z0-9]{2,62}$", name)) && lower(name) != "tables"
+    ])
+    error_message = "Table names must contain 3-63 letters or digits, begin with a letter and not use the reserved name Tables."
+  }
+
+  validation {
+    condition     = length(toset([for name in var.tables : lower(name)])) == length(var.tables)
+    error_message = "Table names must be unique without regard to case."
+  }
+}
