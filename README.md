@@ -2,6 +2,7 @@
 
 Provisions an [Azure Storage Account](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account)
 with optional private Blob containers, Storage Queues and Storage Tables,
+optional Blob soft delete and versioning,
 plus explicit transport, authentication, replication, identity, and public
 endpoint firewall controls. Secure defaults enforce TLS 1.2, disable anonymous
 blob access, and add a system-assigned managed identity. The caller owns the
@@ -15,6 +16,7 @@ graph LR
     group --> storage[Azure Storage Account]
     storage --> identity[System-assigned Managed Identity]
     storage --> containers[Optional private Blob containers]
+    storage --> protection[Optional Blob soft delete and versioning]
     storage --> queues[Optional Storage Queues]
     storage --> tables[Optional Storage Tables]
 ```
@@ -23,7 +25,7 @@ graph LR
 
 ```hcl
 module "storage" {
-  source               = "git::https://github.com/f2calv/tf_module_azurerm_storage_account.git//src?ref=0.4.0"
+  source               = "git::https://github.com/f2calv/tf_module_azurerm_storage_account.git//src?ref=0.5.0"
   resource_group_name  = azurerm_resource_group.rg.name
   location             = azurerm_resource_group.rg.location
   storage_account_name = "mystorageaccount"
@@ -81,8 +83,40 @@ not select Terraform's authentication method. See
 
 Removing or renaming a collection entry destroys that resource and its data on
 apply. These collections do not enable soft delete, versioning or automatic
-expiry. Message TTL belongs to each queue producer, not the queue resource.
+expiry; use [`blob_data_protection`](#blob-data-protection) for Blob recovery.
+Message TTL belongs to each queue producer, not the queue resource.
 Review saved plans and arrange independent recovery before destructive changes.
+
+### Blob Data Protection
+
+Blob data protection requires release `0.5.0` or later.
+
+```hcl
+module "storage_with_recovery" {
+  source               = "git::https://github.com/f2calv/tf_module_azurerm_storage_account.git//src?ref=0.5.0"
+  resource_group_name  = azurerm_resource_group.rg.name
+  storage_account_name = "examplestorage"
+  containers           = ["backups"]
+  blob_data_protection = {
+    delete_retention_days           = 30
+    container_delete_retention_days = 7
+  }
+}
+```
+
+The [`blob_data_protection` input](src/variables.tf) defaults to `null`, which leaves the
+account's Blob service properties unmanaged, so existing callers see no change. When set:
+
+- `delete_retention_days` enables blob soft delete. Deleted blobs, and the previous content of
+  overwritten blobs, stay recoverable for that many days.
+- `container_delete_retention_days` enables container soft delete for that many days.
+- `versioning_enabled` keeps every previous blob version until it is deleted; it defaults to
+  `false`.
+
+Retention values must be whole days from 1 to 365, and an omitted option is disabled. The input
+requires a `StorageV2`, `BlobStorage` or `BlockBlobStorage` account. Setting it manages the whole
+Blob service properties block, so later removing it does not switch protection off. Disable an
+option explicitly first. Soft-deleted data and versions are billed as stored data.
 
 <!-- markdownlint-disable MD033 MD060 -->
 <!-- BEGIN_TF_DOCS -->
@@ -119,6 +153,7 @@ Review saved plans and arrange independent recovery before destructive changes.
 | account\_replication\_type | Storage account replication type (LRS, GRS, RAGRS, ZRS). | `string` | `"LRS"` | no |
 | account\_tier | Storage account tier (Standard or Premium). | `string` | `"Standard"` | no |
 | allow\_nested\_items\_to\_be\_public | Whether nested items may be configured for anonymous public access. | `bool` | `false` | no |
+| blob\_data\_protection | Blob and container soft delete retention in days and blob versioning, or null to leave Blob service properties unmanaged. | ```object({ delete_retention_days = optional(number) container_delete_retention_days = optional(number) versioning_enabled = optional(bool, false) })``` | `null` | no |
 | containers | Names of private Blob containers to manage. | `set(string)` | `[]` | no |
 | cross\_tenant\_replication\_enabled | Whether object replication may cross Microsoft Entra tenants. | `bool` | `false` | no |
 | default\_to\_oauth\_authentication | Whether Azure portal data operations default to OAuth authentication. | `bool` | `false` | no |
