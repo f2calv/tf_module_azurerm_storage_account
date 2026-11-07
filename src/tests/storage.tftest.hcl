@@ -320,3 +320,80 @@ run "blob_account_accepts_containers" {
     error_message = "Blob-only accounts must support private containers without queues or tables."
   }
 }
+
+run "blob_data_protection_omitted" {
+  command = plan
+
+  assert {
+    condition     = length(azurerm_storage_account.this.blob_properties) == 0
+    error_message = "Omitting blob data protection must leave Blob service properties unmanaged."
+  }
+}
+
+run "blob_data_protection_enabled" {
+  command = plan
+  variables {
+    blob_data_protection = {
+      delete_retention_days           = 30
+      container_delete_retention_days = 7
+      versioning_enabled              = true
+    }
+  }
+  assert {
+    condition = (
+      azurerm_storage_account.this.blob_properties[0].versioning_enabled &&
+      azurerm_storage_account.this.blob_properties[0].delete_retention_policy[0].days == 30 &&
+      azurerm_storage_account.this.blob_properties[0].container_delete_retention_policy[0].days == 7
+    )
+    error_message = "Blob data protection must set soft delete retention and versioning as requested."
+  }
+}
+
+run "blob_soft_delete_only" {
+  command = plan
+  variables {
+    blob_data_protection = {
+      delete_retention_days = 14
+    }
+  }
+  assert {
+    condition = (
+      !azurerm_storage_account.this.blob_properties[0].versioning_enabled &&
+      azurerm_storage_account.this.blob_properties[0].delete_retention_policy[0].days == 14 &&
+      length(azurerm_storage_account.this.blob_properties[0].container_delete_retention_policy) == 0
+    )
+    error_message = "Unset protection options must stay disabled or omitted."
+  }
+}
+
+run "blob_soft_delete_retention_too_long" {
+  command = plan
+  variables {
+    blob_data_protection = {
+      delete_retention_days = 366
+    }
+  }
+  expect_failures = [var.blob_data_protection]
+}
+
+run "container_soft_delete_retention_zero" {
+  command = plan
+  variables {
+    blob_data_protection = {
+      container_delete_retention_days = 0
+    }
+  }
+  expect_failures = [var.blob_data_protection]
+}
+
+run "file_account_rejects_blob_data_protection" {
+  command = plan
+  variables {
+    account_kind = "FileStorage"
+    account_tier = "Premium"
+    blob_data_protection = {
+      delete_retention_days = 7
+    }
+  }
+  expect_failures = [azurerm_storage_account.this]
+}

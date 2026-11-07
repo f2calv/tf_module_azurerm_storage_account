@@ -117,6 +117,24 @@ variable "tags" {
   default     = {}
 }
 
+variable "blob_data_protection" {
+  type = object({
+    delete_retention_days           = optional(number)
+    container_delete_retention_days = optional(number)
+    versioning_enabled              = optional(bool, false)
+  })
+  description = "Blob and container soft delete retention in days and blob versioning, or null to leave Blob service properties unmanaged."
+  default     = null
+
+  validation {
+    condition = var.blob_data_protection == null || alltrue([
+      for days in [var.blob_data_protection.delete_retention_days, var.blob_data_protection.container_delete_retention_days] :
+      days == null ? true : days >= 1 && days <= 365 && floor(days) == days
+    ])
+    error_message = "Soft delete retention must be a whole number of days from 1 to 365."
+  }
+}
+
 variable "containers" {
   type        = set(string)
   description = "Names of private Blob containers to manage."

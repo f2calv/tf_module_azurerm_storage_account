@@ -28,6 +28,35 @@ resource "azurerm_storage_account" "this" {
       condition     = (length(var.queues) == 0 && length(var.tables) == 0) || (contains(["Storage", "StorageV2"], var.account_kind) && var.account_tier == "Standard")
       error_message = "Queues and tables require a Standard Storage or StorageV2 account."
     }
+
+    precondition {
+      condition     = var.blob_data_protection == null || contains(["StorageV2", "BlobStorage", "BlockBlobStorage"], var.account_kind)
+      error_message = "Blob data protection requires a StorageV2, BlobStorage or BlockBlobStorage account."
+    }
+  }
+
+  dynamic "blob_properties" {
+    for_each = var.blob_data_protection == null ? [] : [var.blob_data_protection]
+
+    content {
+      versioning_enabled = blob_properties.value.versioning_enabled
+
+      dynamic "delete_retention_policy" {
+        for_each = blob_properties.value.delete_retention_days == null ? [] : [blob_properties.value.delete_retention_days]
+
+        content {
+          days = delete_retention_policy.value
+        }
+      }
+
+      dynamic "container_delete_retention_policy" {
+        for_each = blob_properties.value.container_delete_retention_days == null ? [] : [blob_properties.value.container_delete_retention_days]
+
+        content {
+          days = container_delete_retention_policy.value
+        }
+      }
+    }
   }
 
   dynamic "network_rules" {
